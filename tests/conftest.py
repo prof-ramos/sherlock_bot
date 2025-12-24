@@ -3,21 +3,15 @@ Configurações compartilhadas para testes do pytest.
 """
 
 import os
+from collections.abc import Generator
+from pathlib import Path
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-
-@pytest.fixture(scope="session", autouse=True)
-def set_test_env():
-    """Define variáveis de ambiente para testes."""
-    # Tokens longos para passar validação min_length=50
-    os.environ["DISCORD_TOKEN"] = "a" * 50
-    os.environ["OPENROUTER_API_KEY"] = "b" * 50
-
-
-# Set environment variables for test collection
-os.environ["DISCORD_TOKEN"] = "test_token"
-os.environ["OPENROUTER_API_KEY"] = "test_key"
+# Set environment variables for test collection (must be valid length for Pydantic validation)
+os.environ["DISCORD_TOKEN"] = "a" * 50  # Minimum 50 characters required by validation
+os.environ["OPENROUTER_API_KEY"] = "b" * 50  # Minimum 50 characters required by validation
 os.environ["AI_MODEL"] = "test/model"
 
 

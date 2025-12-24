@@ -200,6 +200,27 @@ Bot: Listas são mutáveis, tuplas são imutáveis...
 - **Timeout**: 30s padrão para respostas da IA
 - **Limite de Tamanho**: Respostas truncadas em 4000 caracteres
 
+### 🎭 Customizando o Comportamento do Bot
+
+O prompt do sistema (personalidade e instruções) do bot está em `prompts/system_prompt.md` e pode ser facilmente editado:
+
+```markdown
+# Sherlock - System Prompt
+
+Você é Sherlock, um assistente inteligente e prestativo.
+
+Responda de forma clara, concisa e amigável em português brasileiro.
+```
+
+**Editar prompt**:
+```bash
+nano prompts/system_prompt.md  # ou seu editor preferido
+```
+
+**Aplicar mudanças**: Reinicie o bot após editar o prompt.
+
+Para mais detalhes, consulte a seção [Prompt Management](CLAUDE.md#prompt-management) em `CLAUDE.md`.
+
 ## 🧪 Testes
 
 ### Executar Todos os Testes
@@ -235,11 +256,14 @@ sherlock_bot/
 ├── database.py               # 🗄️ SQLite com histórico de conversas
 ├── logger.py                 # 📝 Logging estruturado com Loguru
 ├── rate_limiter.py           # 🛡️ Controle de rate limiting
+├── prompt_loader.py          # 🎭 Carregador de prompts do sistema
 ├── pyproject.toml            # 📦 Configuração do projeto e dependências
 ├── uv.lock                   # 🔒 Lock file das dependências
 ├── .env.example              # 📋 Template de variáveis de ambiente
 ├── .env                      # 🔐 Credenciais (não versionado)
 ├── .gitignore                # 🚫 Arquivos ignorados pelo Git
+├── prompts/                  # 🎭 Prompts do sistema (personalizáveis)
+│   └── system_prompt.md      # 📝 System prompt do Sherlock
 ├── tests/                    # 🧪 Testes automatizados
 │   ├── conftest.py           # 🏗️ Configurações compartilhadas
 │   ├── test_*.py             # 🧪 Testes por módulo

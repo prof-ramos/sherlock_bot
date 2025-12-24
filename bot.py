@@ -30,6 +30,7 @@ from database import (
     init_db,
 )
 from logger import logger
+from prompt_loader import load_system_prompt
 from rate_limiter import rate_limit
 
 
@@ -38,12 +39,16 @@ class EmptyAIResponseError(Exception):
 
     pass
 
+
 # Cliente OpenRouter (compatível com OpenAI)
 # Configuração é validada automaticamente via config.py
 openai_client = AsyncOpenAI(
     api_key=settings.openrouter_api_key,
     base_url="https://openrouter.ai/api/v1",
 )
+
+# Carregar system prompt na inicialização (cache global)
+SYSTEM_PROMPT = load_system_prompt()
 
 # Configurar intents
 intents = discord.Intents.default()
@@ -114,9 +119,7 @@ async def chamar_ia(messages: list[dict]) -> AIResponse:
             model=response.model,
         )
     except TimeoutError:
-        logger.error(
-            f"Timeout de {settings.request_timeout_seconds}s atingido na chamada da IA"
-        )
+        logger.error(f"Timeout de {settings.request_timeout_seconds}s atingido na chamada da IA")
         raise
 
 
@@ -146,11 +149,7 @@ async def processar_ia(conteudo: str, user_id: int, channel_id: int) -> str:
         messages = [
             {
                 "role": "system",
-                "content": (
-                    "Você é Sherlock, um assistente inteligente e prestativo. "
-                    "Responda de forma clara, concisa e amigável em português brasileiro. "
-                    "Você tem acesso ao histórico da conversa para manter contexto."
-                ),
+                "content": SYSTEM_PROMPT,
             },
             *context_messages,
             {"role": "user", "content": conteudo},

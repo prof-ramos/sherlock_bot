@@ -15,6 +15,7 @@
 - [Security Guidelines](#security-guidelines)
 - [Development Workflow](#development-workflow)
 - [Configuration Files](#configuration-files)
+- [Prompt Management](#prompt-management)
 - [Common Tasks](#common-tasks)
 - [IDE Integration](#ide-integration)
 - [Troubleshooting](#troubleshooting)
@@ -108,16 +109,20 @@
 sherlock_bot/
 ├── bot.py                    # Main Discord bot application
 ├── database.py               # SQLite database models and operations
+├── prompt_loader.py          # System prompt loader with cache
 ├── pyproject.toml            # Project metadata and tool configuration
 ├── uv.lock                   # Dependency lock file
 ├── .env.example              # Template for environment variables
 ├── .gitignore                # Git ignore rules
 ├── sherlock.db               # SQLite database (auto-generated)
+├── prompts/
+│   └── system_prompt.md      # Sherlock system prompt (editable)
 ├── tests/
 │   ├── __init__.py          # Package marker
 │   ├── conftest.py          # pytest configuration and fixtures
 │   ├── test_database.py     # Database module tests
-│   └── test_bot.py          # Bot module tests
+│   ├── test_bot.py          # Bot module tests
+│   └── test_prompt_loader.py # Prompt loader tests
 ├── docs/
 │   └── ARQUITETURA.md       # Architecture and roadmap
 └── .claude/                  # Claude Code configuration
@@ -427,6 +432,76 @@ DISCORD_TOKEN=your_discord_token_here
 OPENROUTER_API_KEY=your_openrouter_key_here
 AI_MODEL=anthropic/claude-3.5-sonnet
 ```
+
+## Prompt Management
+
+### System Prompt
+
+The Sherlock bot's system prompt (personality and instructions) is stored in `prompts/system_prompt.md` for easy maintenance and versioning.
+
+**Location**: `prompts/system_prompt.md`
+
+**How it Works**:
+1. Prompt is loaded once at bot startup via `prompt_loader.py`
+2. Uses global cache to avoid disk reads on every message
+3. Falls back to default prompt if file is missing/empty
+4. Supports multiline Markdown format
+
+### Editing the Prompt
+
+To modify the bot's behavior, simply edit `prompts/system_prompt.md`:
+
+```markdown
+# Sherlock - System Prompt
+
+Your instructions here...
+
+## Additional Instructions
+
+- Guideline 1
+- Guideline 2
+```
+
+> **Note**: Changes require restarting the bot (cache loads only on startup)
+
+### Prompt Loader API
+
+**Module**: `prompt_loader.py`
+
+```python
+from prompt_loader import load_system_prompt, clear_cache, DEFAULT_SYSTEM_PROMPT
+
+# Load prompt (cached on first call)
+prompt = load_system_prompt()
+
+# Clear cache (useful for testing)
+clear_cache()
+
+# Access default fallback
+fallback = DEFAULT_SYSTEM_PROMPT
+```
+
+### Testing Prompts
+
+Test the prompt loader with:
+
+```bash
+pytest tests/test_prompt_loader.py -v
+```
+
+**Test Coverage**:
+- ✅ File loading and parsing
+- ✅ Cache functionality
+- ✅ Fallback on errors
+- ✅ Multiline content preservation
+
+### Future Enhancements
+
+The prompt management system is designed to support:
+- Per-channel custom prompts (via `/persona` command)
+- Prompt templates for different contexts
+- Multilingual prompts
+- A/B testing of prompts
 
 ## Common Tasks
 
