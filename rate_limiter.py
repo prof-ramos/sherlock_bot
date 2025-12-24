@@ -58,6 +58,52 @@ class RateLimiter:
             self.requests[user_id].append(now)
             return True
 
+    def get_remaining(self, user_id: int) -> int:
+        """
+        Retorna número de requisições restantes para usuário.
+
+        Args:
+            user_id: ID do usuário Discord
+
+        Returns:
+            Número de requisições disponíveis (nunca negativo)
+        """
+        now = datetime.now(UTC)
+        cutoff = now - self.window
+
+        with self._lock:
+            # Remove requisições antigas (fora da janela)
+            self.requests[user_id] = [ts for ts in self.requests[user_id] if ts > cutoff]
+
+            remaining = self.max_requests - len(self.requests[user_id])
+            return max(0, remaining)
+
+    def get_info(self, user_id: int) -> dict[str, Any]:
+        """
+        Retorna informações completas do rate limit para usuário.
+
+        Args:
+            user_id: ID do usuário Discord
+
+        Returns:
+            Dict com informações de rate limit
+        """
+        now = datetime.now(UTC)
+        cutoff = now - self.window
+
+        with self._lock:
+            # Remove requisições antigas (fora da janela)
+            self.requests[user_id] = [ts for ts in self.requests[user_id] if ts > cutoff]
+
+            requests_made = len(self.requests[user_id])
+            return {
+                "user_id": user_id,
+                "requests_made": requests_made,
+                "requests_allowed": self.max_requests,
+                "remaining": max(0, self.max_requests - requests_made),
+                "window_minutes": self.window.total_seconds() / 60,
+            }
+
     def cleanup_inactive_users(self) -> None:
         """
         Remove usuários com timestamps expirados para prevenir vazamento de memória.

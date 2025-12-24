@@ -189,9 +189,7 @@ class TestRateLimitDecorator:
         # e da variável global rate_limiter ser atualizada
 
     @pytest.mark.asyncio
-    async def test_rate_limit_decorator_disabled(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    async def test_rate_limit_decorator_disabled(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Testa que decorator respeita flag de habilitação."""
         from config import settings
 

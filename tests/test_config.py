@@ -26,8 +26,7 @@ class TestSettingsValidation:
 
         errors = exc_info.value.errors()
         assert any(
-            error["type"] == "missing" and error["loc"] == ("discord_token",)
-            for error in errors
+            error["type"] == "missing" and error["loc"] == ("discord_token",) for error in errors
         )
 
     def test_settings_require_openrouter_api_key(self, monkeypatch) -> None:
@@ -53,13 +52,13 @@ class TestSettingsValidation:
 
         settings = Settings(
             _env_file=None,  # type: ignore
-            discord_token="test_token_12345",
-            openrouter_api_key="test_key_67890",
+            discord_token="t" * 50,
+            openrouter_api_key="k" * 50,
             ai_model="anthropic/claude-3.5-sonnet",
         )
 
-        assert settings.discord_token == "test_token_12345"
-        assert settings.openrouter_api_key == "test_key_67890"
+        assert len(settings.discord_token) == 50
+        assert len(settings.openrouter_api_key) == 50
         assert settings.ai_model == "anthropic/claude-3.5-sonnet"
 
     def test_settings_defaults(self) -> None:
@@ -67,8 +66,8 @@ class TestSettingsValidation:
         from config import Settings
 
         settings = Settings(
-            discord_token="test_token",
-            openrouter_api_key="test_key",
+            discord_token="t" * 50,
+            openrouter_api_key="k" * 50,
         )
 
         assert settings.request_timeout_seconds == 30
@@ -121,8 +120,8 @@ class TestSettingsConstraints:
 
         # Válido
         settings = Settings(
-            discord_token="test_token",
-            openrouter_api_key="test_key",
+            discord_token="t" * 50,
+            openrouter_api_key="k" * 50,
             rate_limit_requests_per_minute=30,
         )
         assert settings.rate_limit_requests_per_minute == 30
@@ -167,8 +166,8 @@ class TestSettingsSingleton:
         from config import Settings
 
         settings = Settings(
-            discord_token="super_secret_token_xyz",
-            openrouter_api_key="super_secret_key_abc",
+            discord_token="s" * 50,
+            openrouter_api_key="k" * 50,
         )
 
         repr_str = repr(settings)

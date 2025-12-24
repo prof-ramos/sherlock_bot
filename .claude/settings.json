@@ -56,7 +56,6 @@
             "command": "FILE=$(echo $STDIN_JSON | jq -r '.tool_input.file_path // \"\"'); CONTENT=$(echo $STDIN_JSON | jq -r '.tool_input.content // \"\"); if [[ \"$FILE\" =~ \\.py$ ]] && echo \"$CONTENT\" | grep -q 'print('; then echo 'Warning: print() statements should be replaced with logging' >&2; fi"
           }
         ]
-      },
       }
     ],
     "PostToolUse": [
