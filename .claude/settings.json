@@ -1,0 +1,158 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash",
+      "Edit",
+      "MultiEdit",
+      "Write",
+      "Bash(python:*)",
+      "Bash(pip:*)",
+      "Bash(pytest:*)",
+      "Bash(ruff:*)",
+      "Bash(mypy:*)",
+      "Bash(django-admin:*)",
+      "Bash(flask:*)",
+      "Bash(uvicorn:*)",
+      "Bash(gunicorn:*)",
+      "Bash(git:*)"
+    ],
+    "deny": [
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Bash(rm -rf /)",
+      "Bash(rm -rf ~)",
+      "Bash(rm -rf .)",
+      "Bash(rm -rf ./*)",
+      "Bash(rm -rf  *)",
+      "Bash(git push:*)",
+      "Bash(git remote:*)"
+    ],
+    "defaultMode": "allowEdits"
+  },
+  "env": {
+    "BASH_DEFAULT_TIMEOUT_MS": "60000",
+    "BASH_MAX_OUTPUT_LENGTH": "20000",
+    "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1",
+    "PYTHONPATH": "."
+  },
+  "includeCoAuthoredBy": true,
+  "cleanupPeriodDays": 30,
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '\"\\(.tool_input.command) - \\(.tool_input.description // \"No description\")\"' >> ~/.claude/bash-command-log.txt"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(echo $STDIN_JSON | jq -r '.tool_input.file_path // \"\"'); CONTENT=$(echo $STDIN_JSON | jq -r '.tool_input.content // \"\"); if [[ \"$FILE\" =~ \\.py$ ]] && echo \"$CONTENT\" | grep -q 'print('; then echo 'Warning: print() statements should be replaced with logging' >&2; fi"
+          }
+        ]
+      },
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(echo $STDIN_JSON | jq -r '.tool_input.file_path // \"\"'); if [[ \"$FILE\" == \"requirements.txt\" ]] || [[ \"$FILE\" == \"pyproject.toml\" ]] || [[ \"$FILE\" == \"setup.py\" ]]; then echo 'Checking for vulnerable dependencies...'; if command -v safety >/dev/null 2>&1; then safety check; elif command -v pip-audit >/dev/null 2>&1; then pip-audit; else echo 'No security audit tool found. Install safety or pip-audit'; fi; fi",
+            "timeout": 60
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(echo $STDIN_JSON | jq -r '.tool_input.file_path // \"\"'); if [[ \"$FILE\" =~ \\.py$ ]]; then ruff format \"$FILE\" 2>/dev/null || echo 'Ruff formatting skipped (not installed)'; fi",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(echo $STDIN_JSON | jq -r '.tool_input.file_path // \"\"'); if [[ \"$FILE\" =~ \\.py$ ]]; then ruff check --select I --fix \"$FILE\" 2>/dev/null || echo 'Ruff import sorting skipped'; fi",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(echo $STDIN_JSON | jq -r '.tool_input.file_path // \"\"'); if [[ \"$FILE\" =~ \\.py$ ]]; then if ! command -v ruff >/dev/null 2>&1; then echo 'Error: ruff not found' >&2; exit 1; fi; RESULT=$(ruff check \"$FILE\" 2>&1); if [ $? -ne 0 ]; then echo \"Ruff linting issues found: $RESULT\" >&2; fi; fi",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=$(echo $STDIN_JSON | jq -r '.tool_input.file_path // \"\"'); if [[ \"$FILE\" =~ \\.py$ ]]; then if ! command -v mypy >/dev/null 2>&1; then echo 'Error: mypy not found' >&2; exit 1; fi; RESULT=$(mypy \"$FILE\" 2>&1); if [ $? -ne 0 ]; then echo \"MyPy type checking issues found: $RESULT\" >&2; fi; fi",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"Claude Code notification: $(date)\" >> ~/.claude/notifications.log"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILES=$(git diff --name-only --diff-filter=ACMR | grep '\\.py$'); if [[ -n \"$FILES\" ]]; then echo 'Running linter on changed Python files...'; if command -v ruff >/dev/null 2>&1; then ruff check $FILES; else echo 'Ruff not found for linting'; fi; fi",
+            "timeout": 60
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILES=$(git diff --name-only --diff-filter=ACMR | grep '\\.py$'); if [[ -n \"$FILES\" ]]; then echo 'Running type checking on changed files...'; if command -v mypy >/dev/null 2>&1; then mypy $FILES || echo 'Type checking completed with issues'; else echo 'MyPy not found for type checking'; fi; fi",
+            "timeout": 60
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILES=$(git diff --name-only --diff-filter=ACMR | grep '\\.py$'); if [[ -n \"$FILES\" ]]; then echo 'Running tests on changed files...'; if command -v pytest >/dev/null 2>&1; then pytest $FILES || echo 'Tests failed'; else echo 'Pytest not found'; fi; fi",
+            "timeout": 120
+          }
+        ]
+      }
+    ]
+  }
+}

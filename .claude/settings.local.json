@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv pip list)",
+      "Bash(python -c)",
+      "Bash(uv --version)",
+      "Bash(uv sync)",
+      "Bash(ruff check)",
+      "Bash(ruff format)",
+      "Bash(mypy)",
+      "Bash(pytest)",
+      "Bash(uv run python:*)",
+      "Bash(uv run pytest:*)",
+      "Bash(uv run ruff check:*)",
+      "Bash(uv run mypy:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "context7"
+  ]
+}

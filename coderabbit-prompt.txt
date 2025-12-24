@@ -1,0 +1,552 @@
+Starting CodeRabbit review in plain text mode...
+
+Connecting to review service
+Setting up
+Analyzing
+Reviewing
+
+============================================================================
+File: coderabbit-prompt.txt
+Line: 1 to 14
+Type: potential_issue
+
+Prompt for AI Agent:
+In coderabbit-prompt.txt around lines 1 to 14, this file is an unexplained static artifact that lists prompts for an AI review agent; either (A) if the file is required by the CI/CD/toolchain, add a clear explanatory comment at the very top stating its purpose and lifecycle (for example: what generates it, which pipeline step consumes it, when it should be created/updated/deleted) and add a short entry to the repository docs (README or CONTRIBUTING) describing maintenance and regeneration steps; or (B) if it is a temporary artifact, remove the file from the repo, add an appropriate .gitignore entry or move generation logic to a non-versioned script, and update docs/CI config to show how to reproduce it when needed.
+
+
+
+============================================================================
+File: .claude/agents/sql-pro.md
+Line: 1 to 6
+Type: nitpick
+
+Prompt for AI Agent:
+In .claude/agents/sql-pro.md around lines 1 to 6, the front matter lists tools ("Read, Write, Edit, Bash") without clarifying their meaning; update the front matter to make each tool explicit by replacing or augmenting the tools field with short descriptions or examples (e.g., indicate that Read/Write/Edit refer to file operations or agent file access, and Bash means executing shell scripts/commands), keeping it in YAML front-matter style so parsers still accept it and ensuring each tool description is concise (one-line) and separated clearly.
+
+
+
+============================================================================
+File: .claude/agents/sql-pro.md
+Line: 36
+Type: nitpick
+
+Prompt for AI Agent:
+.claude/agents/sql-pro.md around line 36: the sentence "Support PostgreSQL/MySQL/SQL Server syntax. Always specify which dialect" is truncated and missing a period and the section lacks concrete dialect-specific guidance; fix by adding the missing period and expand this section to explicitly state the dialect in use and provide brief examples of key differences (e.g., LIMIT vs TOP, OFFSET syntax; window function frame syntax differences if any; common data-type mismatches like SERIAL/IDENTITY/AUTO_INCREMENT, BOOLEAN handling, JSON support differences; datetime functions and formats like NOW()/CURRENT_TIMESTAMP vs GETDATE(); identifier quoting with double quotes vs backticks vs brackets; UPSERT syntax differences: ON CONFLICT vs INSERT ... ON DUPLICATE KEY UPDATE vs MERGE; any collation/charset caveats). Keep each example one or two short lines showing the pattern and a note on the pitfall to avoid, so the agent will always require the caller to state the target dialect before generating SQL.
+
+
+
+============================================================================
+File: .gitignore
+Line: 6 to 7
+Type: nitpick
+
+Prompt for AI Agent:
+In .gitignore around lines 6-7, the Banco de dados section currently only ignores .db; expand it to also ignore other local DB file formats used in the project (e.g., .sqlite, .sqlite3, .db-journal, .sqlite-shm, .sqlite-wal) by adding those patterns under the same comment so all common local SQLite and related files are excluded from VCS.
+
+
+
+============================================================================
+File: .claude/commands/test.md
+Line: 39 to 46
+Type: potential_issue
+
+Prompt for AI Agent:
+In .claude/commands/test.md around lines 39 to 46 there is an extra closing triple-backtick that closes the "Async Tests" code block twice; remove the stray  on line 46 so the code block opened with bash is closed only once (leave the opening bash at line 40 and the single corresponding closing  immediately after the bash snippet).
+
+
+
+============================================================================
+File: CLAUDE.md
+Line: 145
+Type: potential_issue
+
+Prompt for AI Agent:
+In CLAUDE.md around line 145, the documentation incorrectly references the directory .agent/workflows/; update this to the correct project directory .claude/workflows/ to match the structure documented earlier (lines 123–126), and scan the file for any other .agent/ occurrences to replace with .claude/ so all references are consistent.
+
+
+
+============================================================================
+File: docs/ARQUITETURA.md
+Line: 90
+Type: potential_issue
+
+Prompt for AI Agent:
+In docs/ARQUITETURA.md around line 90, the SQL CHECK constraint for column role has incorrect syntax for the IN expression; update the column definition to use a proper CHECK clause with parentheses around the expression (e.g., define the column and constraint as role TEXT CHECK (role IN ('user','assistant'))), ensuring the CHECK keyword wraps the parenthesized boolean expression.
+
+
+
+============================================================================
+File: .claude/agents/database-architect.md
+Line: 45 to 46
+Type: nitpick
+
+Prompt for AI Agent:
+In .claude/agents/database-architect.md around lines 45 to 46, the email regex used in the constraint is too strict/complex for production and allows/blocks addresses outside RFC 5322; replace it with a simpler, permissive DB-level pattern (or remove the constraint) and add a clear inline comment documenting its limitations, then enforce strict validation in the application layer (full RFC-aware checks, MX/bounce verification) as a second layer; update the schema comment to recommend the two-layer approach and reference where the application validation lives.
+
+
+
+============================================================================
+File: .claude/agents/database-architect.md
+Line: 414 to 426
+Type: potential_issue
+
+Prompt for AI Agent:
+.claude/agents/database-architect.md around lines 414 to 426: the current example suggests using MD5 for sharding which is insecure and can create collisions/hotspots; replace the MD5 usage with a non-cryptographic fast hash (e.g., MurmurHash3) or a strong hash (e.g., SHA-256) and implement consistent, deterministic mapping to shards (compute hash of the customer_id string, convert to a non-negative integer, then map via modulo or a consistent-hashing ring), add the appropriate import (mmh3 or hashlib), handle seed/byte-encoding consistently, and update any examples/tests/comments to show the new hash function and correct negative-value handling so shard selection is stable and collision risk is reduced.
+
+
+
+============================================================================
+File: .claude/agents/database-architect.md
+Line: 136 to 156
+Type: nitpick
+
+Prompt for AI Agent:
+In .claude/agents/database-architect.md around lines 136 to 156, the CustomerService.create_customer block opens an async with self.db.transaction() but lacks error handling; update the method to wrap the transactional block in a try/except, log the specific database or event-publishing error, ensure transaction rollback on exceptions (or re-raise after rollback), and re-raise the exception so callers can handle it; also ensure event_publisher.publish is either inside the successful transaction commit or handled idempotently if published after commit.
+
+
+
+============================================================================
+File: .claude/agents/database-architect.md
+Line: 243 to 256
+Type: nitpick
+
+Prompt for AI Agent:
+In .claude/agents/database-architect.md around lines 243 to 256 the example uses PostgreSQLConnection(), MongoDBConnection(), and RedisConnection() without imports or explanation; clarify whether these are pseudocode wrappers or real library clients, then update the example to import the actual client classes (e.g., psycopg2/psycopg2-binary or sqlalchemy for Postgres, pymongo for MongoDB, redis for Redis) or reference custom wrapper modules, and add a brief note listing the minimum package names and versions required; ensure the top of the snippet shows the import lines and a comment indicating whether the classes are from third-party libraries or project-specific wrappers.
+
+
+
+============================================================================
+File: .claude/agents/mcp-expert.md
+Line: 40 to 42
+Type: potential_issue
+
+Prompt for AI Agent:
+In .claude/agents/mcp-expert.md around lines 40-42 (and also in the example ranges 75-93, 111-172, 218-235) the docs are inconsistent with the guidance to pin MCP server versions and avoid the -y flag: change every occurrence of @latest to a concrete semver (e.g., package@1.2.3) in all examples, remove the -y flag from any examples that are intended for production, and if you want to show unpinned/@latest or -y usage for convenience, move those examples into clearly labeled "DEVELOPMENT ONLY" sections so production examples remain pinned and without -y.
+
+
+
+============================================================================
+File: tests/test_rate_limiter.py
+Line: 130 to 138
+Type: nitpick
+
+Prompt for AI Agent:
+In tests/test_rate_limiter.py around lines 130 to 138, the test mutates internal state by directly changing limiter.requests[user_id][0]; replace this fragile approach by simulating time via a supported mechanism: either add a test-only method on the limiter such as _advance_time(delta: timedelta) that shifts the limiter's internal time reference (or moves stored timestamps appropriately) and call that from the test, OR use a time-freezing library (freezegun or time-machine) to advance wall-clock time for the duration of the assertion; update the test to call the new _advance_time or use the freezegun/time-machine context/fixture and remove any direct writes to limiter.requests so the test relies only on public/test helpers.
+
+
+
+============================================================================
+File: .mcp.json
+Line: 4 to 6
+Type: nitpick
+
+Prompt for AI Agent:
+.mcp.json around lines 4 to 6: the npx invocation is missing the non-interactive flag and an API key; update the "args" array to include "-y" so npx won't prompt, and add a way to pass the Context7 API key (preferably via an environment variable reference like process env or a placeholder in the args) so the tool uses the provided key for higher rate limits; ensure the args order is valid and do not hardcode secrets — reference an env var instead.
+
+
+
+============================================================================
+File: database.py
+Line: 190 to 200
+Type: nitpick
+
+Prompt for AI Agent:
+In database.py around lines 190 to 200, the nested try/except blocks for parsing created_at are messy; replace them with a single helper that tries multiple formats (ISO with/without microseconds and space-separated with/without microseconds) and falls back to datetime.fromisoformat or dateutil.parser.parse if available. Add a small _parse_datetime(value: str) -> datetime function that iterates a list of formats and returns the first successful datetime.strptime result, then use that helper to assign created_at, removing the nested try/excepts; optionally use dateutil.parser.parse as the final fallback if the dependency exists.
+
+
+
+============================================================================
+File: .claude/agents/mcp-expert.md
+Line: 195 to 200
+Type: potential_issue
+
+Prompt for AI Agent:
+In .claude/agents/mcp-expert.md around lines 195 to 200, the numbered list in "Integration Testing" has duplicated "3." entries; change the item on line 199 from "3. Validate security constraints" to "4. Validate security constraints" (and then renumber any subsequent items accordingly if present).
+
+
+
+============================================================================
+File: tests/test_rate_limiter.py
+Line: 248 to 251
+Type: nitpick
+
+Prompt for AI Agent:
+In tests/test_rate_limiter.py around lines 248 to 251, the assertion uses a weak string containment check on call_args; replace it with precise checks of the send_message call arguments: assert interaction.response.send_message.assert_called_once() remains, then extract call_args = interaction.response.send_message.call_args, inspect call_args.kwargs (or call_args[1]) to assert the "content" (or "message") equals the expected "Rate Limit Acionado" and assert the "ephemeral" kwarg is True (or present and truthy), failing explicitly if keys are missing; this makes the test verify both exact message text and the ephemeral flag rather than relying on str(call_args).
+
+
+
+============================================================================
+File: .claude/commands/lint.md
+Line: 100 to 120
+Type: potential_issue
+
+Prompt for AI Agent:
+In .claude/commands/lint.md around lines 100 to 120, the documented TOML snippet is inconsistent with the real pyproject.toml: it lists ignore = ["E501"] under [tool.ruff.lint] and a separate [tool.mypy] block that do not exist in the actual file (MyPy settings are placed under [tool.ruff.lint] in reality). Update the documentation to match the real pyproject.toml by removing or correcting the ignore line and relocating the MyPy settings to the correct section (or alternatively modify pyproject.toml to match this doc); ensure the shown TOML exactly reflects the real file structure and keys (same section names and entries) so the doc and config are synchronized.
+
+
+
+============================================================================
+File: rate_limiter.py
+Line: 122 to 128
+Type: nitpick
+
+Prompt for AI Agent:
+In rate_limiter.py around lines 122 to 128, avoid using an f-string inside logger.warning (it defeats lazy evaluation and can leak sensitive user_id); change the call to use log-message formatting with a placeholder or remove the user_id from the formatted message and pass it via the extra dict instead — e.g. use a static message like "Rate limit acionado para usuário %s" with user_id as a separate argument or "Rate limit acionado para usuário" and keep user_id only in extra; keep the extra={ "user_id": user_id, "limit": settings.rate_limit_requests_per_minute } unchanged.
+
+
+
+============================================================================
+File: tests/test_rate_limiter.py
+Line: 163 to 190
+Type: potential_issue
+
+Prompt for AI Agent:
+In tests/test_rate_limiter.py around lines 163 to 190, the test stops after invoking the decorated function a second time and never asserts that the second request was blocked; to fix, invoke await mock_command(interaction) a second time, capture the return value and assert it is not "success" (or is None depending on decorator behavior), and assert that interaction.response.send_message was awaited with the expected rate-limit message and ephemeral=True (or the project's configured args); this confirms the decorator blocked the second request and sent the proper user-facing response.
+
+
+
+============================================================================
+File: rate_limiter.py
+Line: 60 to 70
+Type: potential_issue
+
+Prompt for AI Agent:
+In rate_limiter.py around lines 60 to 70, get_remaining currently returns max(0, self.max_requests - len(self.requests[user_id])) without removing expired timestamps, which can overcount available slots; update get_remaining to first prune expired timestamps for the given user (same logic used in is_allowed — remove timestamps older than the window), ensure the user_id key exists (create empty list if missing), then compute and return max(0, self.max_requests - len(self.requests[user_id])); alternatively extract the cleanup into a helper (e.g., _prune_requests(user_id)) and call it from both is_allowed and get_remaining.
+
+
+
+============================================================================
+File: logger.py
+Line: 32 to 45
+Type: potential_issue
+
+Prompt for AI Agent:
+In logger.py around lines 32 to 45, the file sink currently uses level="DEBUG", rotation="00:00", no encoding, and no enqueue which is unsafe for prod and multi-process use; change to use a configurable log level (default to INFO in production, only enable DEBUG via env/config), set encoding="utf-8", enable enqueue=True for safe concurrent writes, and make timezone explicit by using utc=True (or document/derive the desired timezone and set utc accordingly) or otherwise use a timezone-aware rotation strategy; also keep retention and compression as needed.
+
+
+
+============================================================================
+File: docs/ARQUITETURA_MELHORIAS.md
+Line: 654 to 705
+Type: potential_issue
+
+
+
+
+============================================================================
+File: .claude/settings.json
+Line: 22
+Type: potential_issue
+
+Prompt for AI Agent:
+.claude/settings.json around line 22: the current blacklist entry "Bash(rm -rf /)" is insufficient to block dangerous remove patterns; expand the denied patterns to include common variants like rm -rf /, rm -rf ~, rm -rf ., rm -rf ./, paths with trailing spaces or quotes, and recursive wildcards, or switch to a whitelist approach. Update the configuration to add these additional denial patterns (and consider normalizing input before matching), or invert logic to only allow a strict set of safe commands so dangerous permutations cannot slip through.
+
+
+
+============================================================================
+File: .claude/settings.json
+Line: 93
+Type: potential_issue
+
+Prompt for AI Agent:
+In .claude/settings.json around lines 93 and 103, the script checks for the existence of tools after trying to run them; move the existence checks so you run command -v ruff before invoking ruff (line ~93) and command -v mypy before invoking mypy (line ~103), and if a check fails print a clear error and exit non-zero; ensure both checks are performed and short-circuit the workflow instead of attempting to execute missing binaries.
+
+
+
+============================================================================
+File: docs/ARQUITETURA_MELHORIAS.md
+Line: 484 to 490
+Type: nitpick
+
+Prompt for AI Agent:
+docs/ARQUITETURA_MELHORIAS.md around lines 484 to 490: the module currently instantiates a global Settings singleton (settings = Settings()) which freezes environment-derived configuration at import time and breaks tests that change env vars; replace the eager global with a lazy, cached accessor function (e.g., a get_settings() decorated with lru_cache(maxsize=1)) and update callers to call get_settings() instead of using the global variable; document that tests should call get_settings.cache_clear() (or monkeypatch the accessor) to reset state between tests.
+
+
+
+============================================================================
+File: tests/conftest.py
+Line: 18 to 40
+Type: nitpick
+
+Prompt for AI Agent:
+In tests/conftest.py around lines 18 to 40 the mock fixtures duplicate hardcoded IDs for user and channel; extract those values into module-level constants (e.g., TEST_USER_ID, TEST_CHANNEL_ID) placed at the top of the file and replace the literal numbers in mock_discord_message and mock_discord_interaction with those constants so the values are documented and reused consistently.
+
+
+
+============================================================================
+File: docs/ARQUITETURA_MELHORIAS.md
+Line: 990 to 1020
+Type: potential_issue
+
+Prompt for AI Agent:
+In docs/ARQUITETURA_MELHORIAS.md around lines 990 to 1020, the example cache implementation incorrectly decorates an instance method with @lru_cache while also maintaining a manual self._cache dict, causing per-instance caching by id(self) and conflicting caching mechanisms; remove the @lru_cache decorator from get_context_cached, rely solely on the instance-level dict keyed by (user_id, channel_id), keep TTL logic and invalidate method, and ensure any imports (get_context_messages) remain inside the method to preserve lazy loading.
+
+
+
+============================================================================
+File: docs/ARQUITETURA_MELHORIAS.md
+Line: 1054 to 1080
+Type: refactor_suggestion
+
+Prompt for AI Agent:
+docs/ARQUITETURA_MELHORIAS.md around lines 1054 to 1080: the MessageRepository contract uses ellipses instead of concrete parameter and return types; replace the placeholder signatures with explicit method contracts (for example: add_message(user_id: int, channel_id: int, role: str, content: str) -> int and get_history(user_id: int, channel_id: int, limit: int = 10) -> list[Message]) and enumerate any additional methods (delete, update, clear) with their types so implementations (SQLite and Postgres) and database.py can be implemented against a complete, consistent interface before starting Phase 1.
+
+
+
+============================================================================
+File: docs/ARQUITETURA_MELHORIAS.md
+Line: 226 to 338
+Type: potential_issue
+
+Prompt for AI Agent:
+In docs/ARQUITETURA_MELHORIAS.md around lines 226 to 338 (and referencing get_context() at ~line 150), add the missing security finding: lack of user input validation/prompt-injection mitigation; fix by implementing and documenting a sanitize_and_validate_input(user_text) routine that is invoked in get_context() before any user content is appended to AI prompts — it should strip/escape control sequences and system prompt tokens, enforce max length and token limits, remove dangerous markup, validate attachments/urls, and return a safe fallback when input fails validation; update docs to state that all user inputs must pass this validation and add unit tests for sanitize_and_validate_input and integration tests ensuring prompt-injection strings are neutralized.
+
+
+
+============================================================================
+File: docs/ARQUITETURA_MELHORIAS.md
+Line: 1098 to 1114
+Type: potential_issue
+
+Prompt for AI Agent:
+In docs/ARQUITETURA_MELHORIAS.md around lines 1098 to 1114, the "Arquivos a Modificar" list omits pyproject.toml; add a new item after the existing four stating: 5. pyproject.toml (adicionar dependências: loguru, pydantic, pydantic-settings, fastapi, uvicorn) so the document explicitly instructs adding those packages in the relevant phases and prevents missing CI/CD dependencies.
+
+
+
+============================================================================
+File: docs/ARQUITETURA_MELHORIAS.md
+Line: 542 to 621
+Type: potential_issue
+
+
+
+
+============================================================================
+File: docs/ARQUITETURA_MELHORIAS.md
+Line: 1086 to 1125
+Type: nitpick
+
+Prompt for AI Agent:
+In docs/ARQUITETURA_MELHORIAS.md around lines 1086 to 1125, the Phase 1/2 timelines are too optimistic; update the schedule to reflect reviewer feedback by extending Phase 1 and Phase 2 to 2–3 weeks each (add explicit buffers for PR review, CI test fixes, and documentation), revise the TOTAL to 8–10 weeks full-time (or 12–16 weeks part-time), and add a short note in the plan listing the extra tasks (PR review, CI troubleshooting, docs) so the timeline and effort estimates are realistic; also mark the [request_verification] as addressed or add a checklist item to request confirmation from the reviewer.
+
+
+
+============================================================================
+File: docs/ARQUITETURA_MELHORIAS.md
+Line: 367 to 402
+Type: potential_issue
+
+Prompt for AI Agent:
+In docs/ARQUITETURA_MELHORIAS.md around lines 367 to 402, the install instruction incorrectly adds loguru as a dev dependency ("uv add --dev loguru"); change the command to "uv add loguru" and update the guidance to state that loguru must be listed under pyproject.toml [tool.poetry.dependencies] (or equivalent dependencies section), not under dev-dependencies, so production installs include the logger.
+
+
+
+============================================================================
+File: docs/ARQUITETURA_MELHORIAS.md
+Line: 1 to 61
+Type: refactor_suggestion
+
+Prompt for AI Agent:
+In docs/ARQUITETURA_MELHORIAS.md around lines 1 to 61, the review flags missing per-phase success criteria, unclear phase dependencies/ordering, absent rollback plans, and an unverified claim "Type hints: 100%"; update the document to (1) add concise, measurable success criteria for each phase (Fase 1–4) as bullet points, (2) explicitly state phase dependencies and whether Phase 2 depends on Phase 1 (or can run in parallel), (3) add simple rollback/mitigation plans for each phase (steps to revert or mitigate if validation fails), and (4) remove or validate the "Type hints: 100%" claim by running a static type-check (mypy/pyright) across the repo and either update the line with the verified percentage and command used or change wording to "Type hints: claimed — verification pending" and note the verification command and owner. Ensure the additions are brief, actionable, and placed under the corresponding sections for traceability.
+
+
+
+============================================================================
+File: logger.py
+Line: 15 to 17
+Type: potential_issue
+
+Prompt for AI Agent:
+In logger.py around lines 15-17, the code creates the logs directory unconditionally which can raise during import if the process lacks permissions or disk is full and the path should be configurable; change it to read a LOG_DIR (or similar) from an environment variable with a sensible default, attempt to create the directory with Path(...).mkdir(parents=True, exist_ok=True) inside a try/except, catch PermissionError and OSError, and on failure fall back to a safe writable location (e.g., tempfile.gettempdir()) and emit a non-raising warning via the existing logger or print so imports don't crash; ensure the final chosen path is used by the logger configuration.
+
+
+
+============================================================================
+File: docs/ARQUITETURA_MELHORIAS.md
+Line: 915 to 973
+Type: potential_issue
+
+
+
+
+============================================================================
+File: docs/ARQUITETURA_MELHORIAS.md
+Line: 1029 to 1050
+Type: potential_issue
+
+Prompt for AI Agent:
+In docs/ARQUITETURA_MELHORIAS.md around lines 1029–1050, the new FastAPI health.py snippet is incomplete and introduces dependency and runtime complexity; instead remove this FastAPI approach and implement the health checks as a Discord slash command inside bot.py: add a /health command handler that uses the existing bot instance (no global lookup), implement or call helper functions check_db_connection(), get_total_messages(), get_active_users(), and get_uptime() within bot code (or import them from your metrics module), ensure they return synchronous or async-safe values, and register the slash command on startup; do not add FastAPI to pyproject.toml unless you intentionally keep a separate HTTP service and, if you do, add FastAPI/uvicorn to dependencies, implement the missing helper functions, and run uvicorn in a thread/process with proper event-loop handling.
+
+
+
+============================================================================
+File: rate_limiter.py
+Line: 48 to 50
+Type: potential_issue
+
+Prompt for AI Agent:
+In rate_limiter.py around lines 48 to 50, the list comprehension updates self.requests[user_id] without synchronization which can race when multiple interactions from the same user are handled concurrently; wrap any reads/writes to self.requests (including trimming old timestamps and appending new ones) with a thread lock (e.g., a global threading.Lock or a per-user lock) to ensure atomic access, acquire the lock before computing cutoff/filtering and modifying the list and release it afterward, or replace the mutable list with a thread-safe structure (e.g., collections.deque with synchronized access) so concurrent handlers cannot corrupt the request history.
+
+
+
+============================================================================
+File: rate_limiter.py
+Line: 44 to 50
+Type: nitpick
+
+Prompt for AI Agent:
+In rate_limiter.py around lines 44 to 50, the code uses datetime.now() which returns a naive datetime; replace it with a timezone-aware timestamp (e.g. datetime.now(timezone.utc)) and ensure you import timezone from datetime, then use that aware now for cutoff calculation so comparisons with stored request timestamps are consistent; additionally, ensure all stored request timestamps are normalized to the same timezone (convert or reject naive timestamps) so the filter ts > cutoff behaves deterministically in production.
+
+
+
+============================================================================
+File: .claude/settings.json
+Line: 113
+Type: potential_issue
+
+Prompt for AI Agent:
+In .claude/settings.json around line 113, there's a hook that runs the entire pytest suite on every Write/Edit/MultiEdit (PostToolUse) which is wasteful; either remove that hook from PostToolUse, or add path-based filters so only tests related to the modified files run, or move the full pytest invocation to the Stop hook so tests run once at session end; implement one of these changes and update the hooks array accordingly to avoid running the full test suite after every edit.
+
+
+
+============================================================================
+File: rate_limiter.py
+Line: 119 to 121
+Type: potential_issue
+
+Prompt for AI Agent:
+In rate_limiter.py around lines 119 to 121, the call to rate_limiter.get_remaining(user_id) on line 121 is dead code because its return value is discarded; remove that line, or if the remaining-quota value was intended to be communicated, assign it to a variable and use it (e.g., include it in the response/log/error path) instead of discarding it.
+
+
+
+============================================================================
+File: docs/ARQUITETURA_MELHORIAS.md
+Line: 1139 to 1143
+Type: potential_issue
+
+Prompt for AI Agent:
+docs/ARQUITETURA_MELHORIAS.md lines 1139-1143: the references section contains a personal absolute path to a private file (/Users/gabrielramos/.claude/plans/memoized-bouncing-pumpkin.md) which won't resolve for others and exposes non-repo data; remove the absolute path and either (a) replace it with a repository-relative path if the file is added to the repo, (b) move the plan content into this docs folder and link relatively, or (c) replace with a descriptive, shareable link (internal wiki, shared drive) or a short descriptive name (e.g., "Plano detalhado: Plano-de-melhoria-memoizacao.md") so the reference is accessible and non-personal.
+
+
+
+============================================================================
+File: tests/test_database.py
+Line: 10 to 20
+Type: potential_issue
+
+Prompt for AI Agent:
+In tests/test_database.py around lines 10 to 20, the test imports reference DB_PATH and MAX_CONTEXT_MESSAGES which were removed from the database module API; update the imports to stop importing those constants (remove DB_PATH and MAX_CONTEXT_MESSAGES) and instead import the settings object from the database module (or appropriate settings export), then update test usages to reference settings.max_context_messages wherever MAX_CONTEXT_MESSAGES was used and use the appropriate settings-backed path instead of DB_PATH; ensure tests import only available names so no ImportError occurs.
+
+
+
+============================================================================
+File: tests/test_bot.py
+Line: 32 to 57
+Type: refactor_suggestion
+
+Prompt for AI Agent:
+tests/test_bot.py lines 32-57: The TestBotCommandHandling class only asserts mock object properties and does not exercise any real bot command logic; either rename the class to TestMockConfiguration to reflect it only validates mock setup, or add real command tests that invoke the bot's command handlers (call the command functions or the bot message/interaction processing entrypoints with the mocks, assert expected side effects/responses and that external clients are used as expected). Ensure new tests use the provided fixtures, await async handlers where needed, and include assertions verifying command behavior rather than only mock attributes.
+
+
+
+============================================================================
+File: tests/test_bot.py
+Line: 10 to 30
+Type: refactor_suggestion
+
+Prompt for AI Agent:
+In tests/test_bot.py around lines 10 to 30, the TestBotInitialization class only asserts environment variables and does not exercise or initialize the bot; either rename the class to TestEnvironmentVariables to match its behavior or replace/extend these tests to actually import and initialize the bot using the env vars (use monkeypatch or the provided env_vars fixture), create a bot instance (or call the module init function), and assert expected attributes or side effects (token passed, client created, or startup method called); update names and assertions accordingly so the test name matches its behavior and the test actually verifies bot initialization.
+
+
+
+============================================================================
+File: config.py
+Line: 22 to 28
+Type: nitpick
+
+Prompt for AI Agent:
+In config.py around lines 22 to 28, the Discord token Field allows an empty string; update the Field call to include min_length=1 (e.g., Field(..., min_length=1, description="Token do bot Discord (obrigatório)")) so the token cannot be an empty string.
+
+
+
+============================================================================
+File: bot.py
+Line: 44
+Type: potential_issue
+
+Prompt for AI Agent:
+In bot.py around line 44, the API client is being initialized with a hard-coded request timeout instead of using the REQUEST_TIMEOUT_SECONDS environment variable declared in .env.example; update the code to read REQUEST_TIMEOUT_SECONDS from settings (or os.environ), parse it as an integer with a safe fallback (e.g., 30) and pass that value as the request timeout when creating the API client so the configured timeout is respected.
+
+
+
+============================================================================
+File: bot.py
+Line: 108 to 109
+Type: potential_issue
+
+Prompt for AI Agent:
+In bot.py around lines 108-109 the code uses asyncio.timeout (added in Python 3.11) which will break installs on older Python; either update the project’s minimum Python requirement to >=3.11 in project metadata and docs, or replace asyncio.timeout with asyncio.wait_for (wrap the coroutine with wait_for(coro, timeout=...)) so compatibility is preserved on Python 3.10 and earlier; update tests and any type hints/comments accordingly to reflect the chosen approach.
+
+
+
+============================================================================
+File: tests/test_config.py
+Line: 189 to 217
+Type: potential_issue
+
+Prompt for AI Agent:
+In tests/test_config.py around lines 189 to 217 the test creates a temporary .env and instantiates Settings but contains no assertions; update the test to actually verify the loaded values by creating the Settings instance with _env_file=str(env_file), capturing the returned Settings object, and asserting its relevant attributes match the .env contents (e.g., discord token, openrouter key, ai model and request timeout), then clean up sys.path in the finally block as already done.
+
+
+
+============================================================================
+File: config.py
+Line: 109 to 117
+Type: potential_issue
+
+Prompt for AI Agent:
+Em config.py nas linhas ~109-117, o bloco try/except está capturando ValueError mas o Pydantic lança ValidationError; importe ValidationError de pydantic no topo do arquivo e altere o except para "except ValidationError as e:" (mantendo a lógica atual de re-raise com a mensagem amigável e o "from e") para que a mensagem personalizada seja exibida quando faltarem variáveis obrigatórias.
+
+
+
+============================================================================
+File: tests/test_config.py
+Line: 65 to 80
+Type: potential_issue
+
+Prompt for AI Agent:
+In tests/test_config.py around lines 65 to 80, the test instantiates Settings without _env_file=None so an existing .env can leak values into the test; update the Settings(...) call to pass _env_file=None (matching other tests) to force config defaults and isolate the test from environment files.
+
+
+
+============================================================================
+File: tests/test_config.py
+Line: 82 to 145
+Type: potential_issue
+
+Prompt for AI Agent:
+In tests/test_config.py around lines 82 to 145, each Settings(...) instantiation in TestSettingsConstraints is not isolating environment loading and must be updated to pass _env_file=None; modify every Settings(...) call in this block (all valid and with pytest.raises cases) to include the keyword argument _env_file=None so tests don't pick up a real .env and become non-deterministic.
+
+
+
+============================================================================
+File: tests/test_bot.py
+Line: 59 to 79
+Type: potential_issue
+
+Prompt for AI Agent:
+In tests/test_bot.py around lines 59 to 79, the tests only verify that tenacity symbols can be imported and that a decorated function that never fails exists, so they don’t actually test retry behavior; replace these with a real retry test: implement a flaky function (or use a closure) that raises a specific exception for the first N invocations then returns a value, apply the tenacity @retry with stop_after_attempt configured to N+1 and a fast/no-wait wait strategy (or monkeypatch tenacity.wait to avoid sleeping), call the function and assert it ultimately returns the expected value and that the flaky function was invoked N+1 times (or assert the exception is raised when attempts exhausted); remove or repurpose the import-only test. Ensure you assert call counts and outcomes rather than just presence of imported symbols.
+
+
+
+============================================================================
+File: config.py
+Line: 90 to 96
+Type: potential_issue
+
+Prompt for AI Agent:
+In config.py around lines 90 to 96, the log_level field currently accepts any string which can lead to runtime failures when configuring Python logging; restrict and validate allowed values (DEBUG, INFO, WARNING, ERROR, CRITICAL) by replacing the loose str field with an explicit constrained type (e.g., an Enum or a typing.Literal of the five valid levels) or add a Pydantic validator that uppercases the input and raises a ValueError if it is not one of the allowed levels; update the Field description to list the exact permitted values and ensure environment-provided values are normalized (uppercased) before validation.
+
+
+
+Review completed ✔
