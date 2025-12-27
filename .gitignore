@@ -54,5 +54,9 @@ wheels/
 .pytest_cache/
 htmlcov/
 
+# Bot runtime
+.bot.pid
+logs/bot.out
+
 # Temporary
 coderabbit-prompt.txt
