@@ -49,5 +49,10 @@ wheels/
 # UV
 .uv/
 
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+
 # Temporary
 coderabbit-prompt.txt
