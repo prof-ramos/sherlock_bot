@@ -32,6 +32,7 @@ The entire `bot.py` module (386 lines) has **no integration tests**. Current `te
 
 #### 1.1 API Integration Tests
 
+
 **File:** `tests/test_bot_api.py`
 
 ```python
@@ -109,6 +110,7 @@ class TestAIResponse:
 ```
 
 #### 1.2 Message Processing Tests
+
 
 **File:** `tests/test_bot_processing.py`
 
@@ -195,6 +197,7 @@ class TestProcessarIA:
 
 #### 1.3 Response Chunking Tests
 
+
 **File:** `tests/test_bot_chunking.py`
 
 ```python
@@ -254,6 +257,7 @@ class TestEnviarResposta:
 ```
 
 #### 1.4 Slash Command Tests
+
 
 **File:** `tests/test_bot_commands.py`
 
@@ -346,6 +350,7 @@ class TestSlashStats:
 ```
 
 #### 1.5 Event Handler Tests
+
 
 **File:** `tests/test_bot_events.py`
 

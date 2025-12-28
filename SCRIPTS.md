@@ -20,7 +20,8 @@ Instala as dependências do projeto usando UV.
 
 ```bash
 ./install.sh [--dev]
-```
+
+```bash
 
 ### Opções
 
@@ -42,7 +43,8 @@ Instala as dependências do projeto usando UV.
 
 # Instalação para desenvolvimento
 ./install.sh --dev
-```
+
+```bash
 
 ### Primeira vez?
 
@@ -58,6 +60,7 @@ nano .env  # Adicione DISCORD_TOKEN, OPENROUTER_API_KEY, etc.
 
 # 4. Iniciar bot
 ./start.sh
+
 ```
 
 ---
@@ -70,7 +73,8 @@ Inicia o Sherlock Bot.
 
 ```bash
 ./start.sh [--background]
-```
+
+```bash
 
 ### Opções
 
@@ -96,20 +100,25 @@ Inicia o Sherlock Bot.
 # Ver logs do bot em background
 tail -f logs/bot.out
 tail -f logs/sherlock_*.log
-```
+
+```bash
 
 ### Troubleshooting
 
 **Erro: "Arquivo .env não encontrado"**
+
 ```bash
 ./install.sh  # Cria .env a partir de .env.example
 nano .env     # Configure suas chaves
+
 ```
 
 **Erro: "Bot já está rodando"**
+
 ```bash
 ./stop.sh     # Para o bot atual
 ./start.sh    # Inicia novamente
+
 ```
 
 ---
@@ -122,7 +131,8 @@ Para o Sherlock Bot que está rodando em background.
 
 ```bash
 ./stop.sh
-```
+
+```bash
 
 ### O que faz
 
@@ -140,7 +150,8 @@ Para o Sherlock Bot que está rodando em background.
 
 # Verificar se bot ainda está rodando
 ps aux | grep bot.py
-```
+
+```bash
 
 ### Notas
 
@@ -157,7 +168,8 @@ Executa os testes do projeto usando pytest.
 
 ```bash
 ./test.sh [opções do pytest]
-```
+
+```bash
 
 ### Opções
 
@@ -194,7 +206,8 @@ Executa os testes do projeto usando pytest.
 
 # Rodar em paralelo (mais rápido)
 ./test.sh -n auto  # Requer pytest-xdist
-```
+
+```bash
 
 ### Comandos úteis
 
@@ -207,6 +220,7 @@ Executa os testes do projeto usando pytest.
 
 # Rodar com output detalhado
 ./test.sh -vv -s
+
 ```
 
 ---
@@ -219,7 +233,8 @@ Executa verificações de qualidade de código (linting, formatação, type chec
 
 ```bash
 ./lint.sh [--fix]
-```
+
+```bash
 
 ### Opções
 
@@ -240,7 +255,8 @@ Executa verificações de qualidade de código (linting, formatação, type chec
 
 # Verificar e corrigir automaticamente
 ./lint.sh --fix
-```
+
+```bash
 
 ### Integração com Git
 
@@ -252,7 +268,8 @@ git commit -m "feat: nova funcionalidade"
 
 # Se lint falhar, corrija os problemas
 ./lint.sh --fix
-```
+
+```bash
 
 ### Verificações individuais
 
@@ -265,6 +282,7 @@ ruff format .
 
 # Apenas type checking
 uv run mypy .
+
 ```
 
 ---
@@ -290,7 +308,8 @@ nano .env  # Adicionar tokens
 
 # 5. Iniciar bot
 ./start.sh
-```
+
+```bash
 
 ### Desenvolvimento diário
 
@@ -314,7 +333,8 @@ nano .env  # Adicionar tokens
 git add .
 git commit -m "feat: descrição"
 git push
-```
+
+```bash
 
 ### Antes de criar Pull Request
 
@@ -324,6 +344,7 @@ git push
 ./test.sh             # Rodar testes
 git status            # Verificar arquivos
 git diff              # Revisar mudanças
+
 ```
 
 ---
@@ -338,7 +359,8 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Adicionar ao PATH (se necessário)
 export PATH="$HOME/.cargo/bin:$PATH"
-```
+
+```bash
 
 ### Dependências não instaladas
 
@@ -346,7 +368,8 @@ export PATH="$HOME/.cargo/bin:$PATH"
 # Reinstalar tudo
 rm -rf .venv
 ./install.sh --dev
-```
+
+```bash
 
 ### Bot não inicia
 
@@ -360,7 +383,8 @@ cat .env  # Verificar se tokens estão configurados
 
 # Rodar em foreground para ver erros
 ./start.sh  # (sem --background)
-```
+
+```bash
 
 ### Testes falhando
 
@@ -374,7 +398,8 @@ cat .env  # Verificar se tokens estão configurados
 # Verificar coverage
 ./test.sh --cov-report=html
 open htmlcov/index.html
-```
+
+```bash
 
 ### Lint falhando
 
@@ -389,6 +414,7 @@ ruff check .
 ruff check --diff .
 ruff format --diff .
 uv run mypy .
+
 ```
 
 ---
@@ -398,14 +424,23 @@ uv run mypy .
 Os scripts criam/usam os seguintes arquivos:
 
 | Arquivo | Descrição | Gitignore? |
+
 |---------|-----------|------------|
+
 | `.bot.pid` | PID do processo do bot (background) | ✅ Sim |
+
 | `logs/bot.out` | Output do bot em background | ✅ Sim |
+
 | `logs/sherlock_*.log` | Logs diários do bot | ✅ Sim |
+
 | `.coverage` | Dados de cobertura de testes | ✅ Sim |
+
 | `htmlcov/` | Relatório HTML de coverage | ✅ Sim |
+
 | `.pytest_cache/` | Cache do pytest | ✅ Sim |
+
 | `.venv/` | Ambiente virtual Python | ✅ Sim |
+
 | `sherlock.db` | Banco de dados SQLite | ✅ Sim |
 
 ---
@@ -422,7 +457,7 @@ Os scripts criam/usam os seguintes arquivos:
 
 ## 💡 Dicas
 
-### Alias úteis (adicione ao ~/.bashrc ou ~/.zshrc)
+### Aliases úteis (adicione ao ~/.bashrc ou ~/.zshrc)
 
 ```bash
 alias bot-start='./start.sh --background'
@@ -431,7 +466,8 @@ alias bot-restart='./stop.sh && ./start.sh --background'
 alias bot-logs='tail -f logs/bot.out'
 alias bot-test='./test.sh'
 alias bot-lint='./lint.sh --fix'
-```
+
+```bash
 
 ### Monitoramento do bot
 
@@ -447,7 +483,8 @@ ps aux | grep bot.py
 
 # Verificar uso de memória
 ps aux | grep bot.py | awk '{print $4"%"}'
-```
+
+```bash
 
 ### CI/CD
 
@@ -463,6 +500,7 @@ Os scripts podem ser usados em pipelines de CI/CD:
 
 - name: Run tests
   run: ./test.sh
+
 ```
 
 ---
