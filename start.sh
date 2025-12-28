@@ -58,12 +58,9 @@ else
     echo -e "${YELLOW}💡 Use Ctrl+C para parar ou './start.sh --background' para rodar em background${NC}"
     echo ""
 
-    # Salvar PID temporariamente
-    echo $$ > "$PID_FILE"
+    # Trap para mostrar mensagem ao sair (Ctrl+C)
+    trap 'echo -e "\n${YELLOW}🛑 Bot encerrado${NC}"' EXIT INT TERM
 
-    # Trap para limpar PID file ao sair
-    trap "rm -f $PID_FILE; echo -e '\n${YELLOW}🛑 Bot encerrado${NC}'" EXIT INT TERM
-
-    # Rodar bot
+    # Rodar bot (PID file não é necessário em foreground)
     uv run python bot.py
 fi
