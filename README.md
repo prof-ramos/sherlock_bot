@@ -40,14 +40,32 @@
 
 ## 🚀 Instalação
 
-### Passo 1: Clonar o Repositório
+### Método Rápido (Recomendado) ⚡
 
 ```bash
+# 1. Clonar o repositório
 git clone https://github.com/prof-ramos/sherlock_bot.git
 cd sherlock_bot
+
+# 2. Instalar dependências
+./install.sh --dev
+
+# 3. Configurar credenciais
+nano .env  # Adicione DISCORD_TOKEN e OPENROUTER_API_KEY
+
+# 4. Rodar testes
+./test.sh
+
+# 5. Iniciar bot
+./start.sh
 ```
 
-### Passo 2: Instalar Dependências
+> 💡 **Veja [SCRIPTS.md](SCRIPTS.md) para documentação completa dos scripts disponíveis**
+
+### Método Manual
+
+<details>
+<summary>Clique para expandir</summary>
 
 ```bash
 # Instalar todas as dependências (produção + desenvolvimento)
@@ -55,17 +73,14 @@ uv sync --group dev
 
 # Verificar instalação
 uv run python --version
-```
 
-### Passo 3: Configurar Ambiente
-
-```bash
 # Copiar arquivo de exemplo
 cp .env.example .env
 
 # Editar com suas credenciais (ver seção abaixo)
 nano .env  # ou seu editor preferido
 ```
+</details>
 
 ## ⚙️ Configuração
 
@@ -137,7 +152,33 @@ LOG_LEVEL=INFO
 
 ## ▶️ Executando o Bot
 
-### Modo Desenvolvimento
+### Scripts de Gerenciamento
+
+```bash
+# Iniciar bot (foreground - logs no terminal)
+./start.sh
+
+# Iniciar bot em background (daemon)
+./start.sh --background
+
+# Parar bot
+./stop.sh
+
+# Ver logs (modo background)
+tail -f logs/bot.out
+tail -f logs/sherlock_*.log
+
+# Rodar testes
+./test.sh
+
+# Verificar qualidade do código
+./lint.sh --fix
+```
+
+### Modo Manual
+
+<details>
+<summary>Clique para expandir</summary>
 
 ```bash
 # Executar diretamente
@@ -146,6 +187,7 @@ uv run python bot.py
 # Ou com logging detalhado
 LOG_LEVEL=DEBUG uv run python bot.py
 ```
+</details>
 
 ### Modo Produção (Recomendado)
 

@@ -6,7 +6,6 @@ Fornece logging estruturado, centralizado e rotacionado automaticamente.
 
 import sys
 from pathlib import Path
-from typing import Optional
 
 from loguru import logger as _logger
 
@@ -14,7 +13,7 @@ from loguru import logger as _logger
 _logger.remove()
 
 # Criar diretório de logs de forma robusta
-logs_dir: Optional[Path] = None
+logs_dir: Path | None = None
 try:
     logs_dir = Path(__file__).parent.resolve() / "logs"
     logs_dir.mkdir(parents=True, exist_ok=True)
